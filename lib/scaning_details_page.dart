@@ -51,6 +51,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
     'COSMETICS-HEALTH CARE EQUIPMENTS',
     'COSMETICS-ORAL CARE',
     'COSMETICS-PERFUMES & DEO.',
+    'CHECKOUT AREA ',
     'DETERGENTS-CLEANING ACCESSORIES',
     'DETERGENTS-CLEANING AGENTS',
     'DETERGENTS-DISH WASH',
@@ -61,7 +62,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
     'DETERGENTS-SPRAY CLEANERS',
     'DETERGENTS-WC FRESHNER',
     'ELECTRONICS-AUDIO & MUSIC',
-    'ELECTRONICS-CAMERA, LENS AND ACCESSORIES',
+    'ELECTRONICS-CAMERA & LENS AND ACCESSORIES',
     'ELECTRONICS-GAMING & ACCESSORIES',
     'ELECTRONICS-GROOMING TOOLS',
     'ELECTRONICS-HOME APPLIANCES',
@@ -92,7 +93,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
     'FOOD PRODUCTS-PASTA',
     'FOOD PRODUCTS-PRESERVED FOOD',
     'FOOD PRODUCTS-SAUCE & DRESSING',
-    'FOOD PRODUCTS-SUGAR,SUGAR SUBSTITUTE AND SARBATH',
+    'FOOD PRODUCTS-SUGAR & SUGAR SUBSTITUTE AND SARBATH',
     'FOOD PRODUCTS-TAE & COFFEE',
     'FOOTWEAR-KIDS SHOE',
     'FOOTWEAR-LADIES SANDAL',
@@ -204,7 +205,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
 
   Future<void> _fetchScanningDetails() async {
     final String apiUrl =
-        'https://www.talalgroupintl.com/stk_info_api/inv_scaning_get_scaning_record.php?shop_id=${widget.shop['id']}';
+        'http://192.168.100.110/stk_info_api/inv_scaning_get_scaning_record.php?shop_id=${widget.shop['id']}';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -249,7 +250,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
     required String user,
     required String sections,
   }) async {
-    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_form_scaning_record.php';
+    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_form_scaning_record.php';
 
     try {
       final response = await http.post(
@@ -286,7 +287,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
     required String user,
     required String sections,
   }) async {
-    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_update_records.php';
+    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_update_records.php';
 
     try {
       final response = await http.post(
@@ -321,7 +322,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
   Future<void> _deleteScanningDetail({
     required int id,
   }) async {
-    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/delete_scanning_record.php';
+    const String apiUrl = 'http://192.168.100.110/stk_info_api/delete_scanning_record.php';
 
     try {
       final response = await http.post(

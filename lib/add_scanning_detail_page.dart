@@ -46,6 +46,7 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
     'COSMETICS-HEALTH CARE EQUIPMENTS',
     'COSMETICS-ORAL CARE',
     'COSMETICS-PERFUMES & DEO.',
+    'CHECKOUT AREA ',
     'DETERGENTS-CLEANING ACCESSORIES',
     'DETERGENTS-CLEANING AGENTS',
     'DETERGENTS-DISH WASH',
@@ -56,7 +57,7 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
     'DETERGENTS-SPRAY CLEANERS',
     'DETERGENTS-WC FRESHNER',
     'ELECTRONICS-AUDIO & MUSIC',
-    'ELECTRONICS-CAMERA, LENS AND ACCESSORIES',
+    'ELECTRONICS-CAMERA & LENS AND ACCESSORIES',
     'ELECTRONICS-GAMING & ACCESSORIES',
     'ELECTRONICS-GROOMING TOOLS',
     'ELECTRONICS-HOME APPLIANCES',
@@ -87,7 +88,7 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
     'FOOD PRODUCTS-PASTA',
     'FOOD PRODUCTS-PRESERVED FOOD',
     'FOOD PRODUCTS-SAUCE & DRESSING',
-    'FOOD PRODUCTS-SUGAR,SUGAR SUBSTITUTE AND SARBATH',
+    'FOOD PRODUCTS-SUGAR & SUGAR SUBSTITUTE AND SARBATH',
     'FOOD PRODUCTS-TAE & COFFEE',
     'FOOTWEAR-KIDS SHOE',
     'FOOTWEAR-LADIES SANDAL',
@@ -207,7 +208,7 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
     required String user,
     required String sections,
   }) async {
-    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_form_scaning_record.php';
+    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_form_scaning_record.php';
 
     try {
       final response = await http.post(
