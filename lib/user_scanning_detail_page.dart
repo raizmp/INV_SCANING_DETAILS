@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class UserScanningDetailPage extends StatelessWidget {
@@ -7,7 +8,7 @@ class UserScanningDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sections = scan['sections']?.split(',') ?? [];
+    final sectionsList = scan['sections'] as List<dynamic>? ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -39,16 +40,16 @@ class UserScanningDetailPage extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            sections.isEmpty
+            sectionsList.isEmpty
                 ? const Center(child: Text('No sections available'))
                 : Expanded(
                     child: ListView.builder(
-                      itemCount: sections.length,
+                      itemCount: sectionsList.length,
                       itemBuilder: (context, index) {
-                        final section = sections[index];
-                        final match = RegExp(r'^([^()]+)(\(([^()]*)\))?$').firstMatch(section.trim());
-                        final sectionName = match?.group(1)?.trim() ?? section.trim();
-                        final comment = match?.group(3)?.trim() ?? '';
+                        final section = sectionsList[index] as Map<String, dynamic>;
+                        final sectionName = section['section'] as String? ?? '';
+                        final comment = section['comment'] as String? ?? '';
+                        final image = section['image'] as String?;
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ListTile(
@@ -62,12 +63,80 @@ class UserScanningDetailPage extends StatelessWidget {
                                   : sectionName,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
+                            trailing: image != null
+                                ? GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => FullScreenImagePage(
+                                            imageUrl: 'https://www.talalgroupintl.com/stk_info_api/$image',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Image.network(
+                                      'https://www.talalgroupintl.com/stk_info_api/$image',
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => const Icon(
+                                        Icons.broken_image,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  )
+                                : null,
                           ),
                         );
                       },
                     ),
                   ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class FullScreenImagePage extends StatelessWidget {
+  final String imageUrl;
+
+  const FullScreenImagePage({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.contain,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const CircularProgressIndicator(
+              color: Colors.white,
+            );
+          },
+          errorBuilder: (context, error, stackTrace) => const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.broken_image, color: Colors.grey, size: 48),
+              SizedBox(height: 16),
+              Text(
+                'Failed to load image',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
         ),
       ),
     );

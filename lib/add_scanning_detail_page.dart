@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
 class AddScanningDetailPage extends StatefulWidget {
   final Map<String, dynamic> shop;
 
@@ -13,7 +14,7 @@ class AddScanningDetailPage extends StatefulWidget {
 
 class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
   final TextEditingController _userController = TextEditingController();
-  List<Map<String, TextEditingController>> sectionControllers = [];
+  List<Map<String, dynamic>> sectionControllers = [];
   bool _isButtonPressed = false;
 
   static const List<String> sections = [
@@ -208,7 +209,7 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
     required String user,
     required String sections,
   }) async {
-    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_form_scaning_record.php';
+    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_form_scaning_record.php';
 
     try {
       final response = await http.post(
@@ -252,212 +253,239 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
   }
 
   // Show dialog to select a section
-  void _showAddSectionDialog() {
-    final sectionController = TextEditingController();
-    final commentController = TextEditingController();
-    bool isDialogButtonPressed = false;
+//   void _showAddSectionDialog() {
+//   final sectionController = TextEditingController();
+//   final commentController = TextEditingController();
+//   bool isDialogButtonPressed = false;
+//   File? selectedImage;
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text(
-                'Add Section',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Autocomplete<String>(
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        print('Add Section Dialog optionsBuilder called with: ${textEditingValue.text}');
-                        if (textEditingValue.text.isEmpty) {
-                          return sections;
-                        }
-                        return sections.where((String section) =>
-                            section.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                      },
-                      onSelected: (String selection) {
-                        sectionController.text = selection;
-                      },
-                      fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-                        textEditingController.text = sectionController.text;
-                        textEditingController.addListener(() {
-                          sectionController.text = textEditingController.text;
-                        });
-                        return TextField(
-                          controller: textEditingController,
-                          focusNode: focusNode,
-                          decoration: InputDecoration(
-                            labelText: 'Section',
-                            prefixIcon: Icon(Icons.category, color: Colors.blue[800]),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            suffixIcon: textEditingController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: Icon(Icons.clear, color: Colors.grey[600]),
-                                    onPressed: () {
-                                      textEditingController.clear();
-                                      sectionController.clear();
-                                      FocusScope.of(context).unfocus();
-                                    },
-                                  )
-                                : null,
-                          ),
-                        );
-                      },
-                      optionsViewBuilder: (context, onSelected, options) {
-                        print('Add Section Dialog optionsViewBuilder called with ${options.length} options');
-                        return Align(
-                          alignment: Alignment.topLeft,
-                          child: Material(
-                            elevation: 4.0,
-                            borderRadius: BorderRadius.circular(8),
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxHeight: 200, maxWidth: 300),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: options.length,
-                                itemBuilder: (context, index) {
-                                  final option = options.elementAt(index);
-                                  return ListTile(
-                                    title: Text(
-                                      option,
-                                      style: Theme.of(context).textTheme.bodyMedium,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    onTap: () => onSelected(option),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: commentController,
-                      decoration: InputDecoration(
-                        labelText: 'Comment (optional)',
-                        prefixIcon: Icon(Icons.comment, color: Colors.blue[800]),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                ),
-                GestureDetector(
-                  onTapDown: (_) {
-                    setDialogState(() {
-                      isDialogButtonPressed = true;
-                    });
-                  },
-                  onTapUp: (_) {
-                    setDialogState(() {
-                      isDialogButtonPressed = false;
-                    });
-                    final section = sectionController.text.trim();
-                    final comment = commentController.text.trim();
-                    if (section.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please select a section'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
-                    if (!sections.contains(section)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Invalid section: $section'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
-                    if (comment.contains(',')) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Commas are not allowed in the comment'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
-                    setState(() {
-                      sectionControllers.add({
-                        'section': TextEditingController(text: section),
-                        'comment': TextEditingController(text: comment),
-                      });
-                    });
-                    Navigator.pop(context);
-                  },
-                  onTapCancel: () {
-                    setDialogState(() {
-                      isDialogButtonPressed = false;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    transform: Matrix4.identity()..scale(isDialogButtonPressed ? 0.95 : 1.0),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue[700]!, Colors.teal[400]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      ),
-                      child: const Text(
-                        'Add',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+//   final ImagePicker picker = ImagePicker();
+
+// showDialog(
+//     context: context,
+//     builder: (context) {
+//       return StatefulBuilder(
+//         builder: (context, setDialogState) {
+//           return AlertDialog(
+//             title: const Text(
+//               'Add Section',
+//               style: TextStyle(fontWeight: FontWeight.bold),
+//             ),
+//             backgroundColor: Colors.white,
+//             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+//             content: SingleChildScrollView(
+//               child: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 children: [
+//                   Autocomplete<String>(
+//                     optionsBuilder: (TextEditingValue textEditingValue) {
+//                       if (textEditingValue.text.isEmpty) {
+//                         return sections;
+//                       }
+//                       return sections.where((String section) =>
+//                           section.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+//                     },
+//                     onSelected: (String selection) {
+//                       sectionController.text = selection;
+//                     },
+//                     fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+//                       textEditingController.text = sectionController.text;
+//                       textEditingController.addListener(() {
+//                         sectionController.text = textEditingController.text;
+//                       });
+//                       return TextField(
+//                         controller: textEditingController,
+//                         focusNode: focusNode,
+//                         decoration: InputDecoration(
+//                           labelText: 'Section',
+//                           prefixIcon: Icon(Icons.category, color: Colors.blue[800]),
+//                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+//                           filled: true,
+//                           fillColor: Colors.grey[100],
+//                           suffixIcon: textEditingController.text.isNotEmpty
+//                               ? IconButton(
+//                                   icon: Icon(Icons.clear, color: Colors.grey[600]),
+//                                   onPressed: () {
+//                                     textEditingController.clear();
+//                                     sectionController.clear();
+//                                     FocusScope.of(context).unfocus();
+//                                   },
+//                                 )
+//                               : null,
+//                         ),
+//                       );
+//                     },
+//                     optionsViewBuilder: (context, onSelected, options) {
+//                       return Align(
+//                         alignment: Alignment.topLeft,
+//                         child: Material(
+//                           elevation: 4.0,
+//                           borderRadius: BorderRadius.circular(8),
+//                           child: ConstrainedBox(
+//                             constraints: const BoxConstraints(maxHeight: 200, maxWidth: 300),
+//                             child: ListView.builder(
+//                               shrinkWrap: true,
+//                               itemCount: options.length,
+//                               itemBuilder: (context, index) {
+//                                 final option = options.elementAt(index);
+//                                 return ListTile(
+//                                   title: Text(
+//                                     option,
+//                                     style: Theme.of(context).textTheme.bodyMedium,
+//                                     overflow: TextOverflow.ellipsis,
+//                                   ),
+//                                   onTap: () => onSelected(option),
+//                                 );
+//                               },
+//                             ),
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                   const SizedBox(height: 16),
+//                   TextField(
+//                     controller: commentController,
+//                     decoration: InputDecoration(
+//                       labelText: 'Comment (optional)',
+//                       prefixIcon: Icon(Icons.comment, color: Colors.blue[800]),
+//                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+//                       filled: true,
+//                       fillColor: Colors.grey[100],
+//                     ),
+//                   ),
+//                   const SizedBox(height: 16),
+//                   Row(
+//                     children: [
+//                       ElevatedButton.icon(
+//                         onPressed: () async {
+//                           final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+//                           if (image != null) {
+//                             setDialogState(() {
+//                               selectedImage = File(image.path);
+//                             });
+//                           }
+//                         },
+//                         icon: const Icon(Icons.image),
+//                         label: const Text('Upload Image'),
+//                       ),
+//                       const SizedBox(width: 12),
+//                       if (selectedImage != null)
+//                         ClipRRect(
+//                           borderRadius: BorderRadius.circular(8),
+//                           child: Image.file(
+//                             selectedImage!,
+//                             width: 60,
+//                             height: 60,
+//                             fit: BoxFit.cover,
+//                           ),
+//                         ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             actions: [
+//               TextButton(
+//                 onPressed: () => Navigator.pop(context),
+//                 child: Text('Cancel', style: TextStyle(color: Colors.grey[700])),
+//               ),
+//               GestureDetector(
+//                 onTapDown: (_) {
+//                   setDialogState(() {
+//                     isDialogButtonPressed = true;
+//                   });
+//                 },
+//                 onTapUp: (_) {
+//                   setDialogState(() {
+//                     isDialogButtonPressed = false;
+//                   });
+
+//                   final section = sectionController.text.trim();
+//                   final comment = commentController.text.trim();
+
+//                   if (section.isEmpty) {
+//                     ScaffoldMessenger.of(context).showSnackBar(
+//                       const SnackBar(
+//                         content: Text('Please select a section'),
+//                         backgroundColor: Colors.red,
+//                       ),
+//                     );
+//                     return;
+//                   }
+//                   if (!sections.contains(section)) {
+//                     ScaffoldMessenger.of(context).showSnackBar(
+//                       SnackBar(
+//                         content: Text('Invalid section: $section'),
+//                         backgroundColor: Colors.red,
+//                       ),
+//                     );
+//                     return;
+//                   }
+//                   if (comment.contains(',')) {
+//                     ScaffoldMessenger.of(context).showSnackBar(
+//                       const SnackBar(
+//                         content: Text('Commas are not allowed in the comment'),
+//                         backgroundColor: Colors.red,
+//                       ),
+//                     );
+//                     return;
+//                   }
+
+//                   setState(() {
+//                     sectionControllers.add({
+//                       'section': TextEditingController(text: section),
+//                       'comment': TextEditingController(text: comment),
+//                       'image': selectedImage, // Optional use
+//                     });
+//                   });
+
+//                   Navigator.pop(context);
+//                 },
+//                 onTapCancel: () {
+//                   setDialogState(() {
+//                     isDialogButtonPressed = false;
+//                   });
+//                 },
+//                 child: AnimatedContainer(
+//                   duration: const Duration(milliseconds: 100),
+//                   transform: Matrix4.identity()..scale(isDialogButtonPressed ? 0.95 : 1.0),
+//                   decoration: BoxDecoration(
+//                     gradient: LinearGradient(
+//                       colors: [Colors.blue[700]!, Colors.teal[400]!],
+//                       begin: Alignment.topLeft,
+//                       end: Alignment.bottomRight,
+//                     ),
+//                     borderRadius: BorderRadius.circular(12),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.blue.withOpacity(0.3),
+//                         blurRadius: 8,
+//                         offset: const Offset(0, 4),
+//                       ),
+//                     ],
+//                   ),
+//                   child: ElevatedButton(
+//                     onPressed: null,
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: Colors.transparent,
+//                       shadowColor: Colors.transparent,
+//                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+//                     ),
+//                     child: const Text(
+//                       'Submit',
+//                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           );
+//         },
+//       );
+//     },
+//   );
+// }
 
   @override
   Widget build(BuildContext context) {
@@ -540,63 +568,63 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
                   );
                 },
               ),
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTapDown: (_) {
-                    setState(() {
-                      _isButtonPressed = true;
-                    });
-                  },
-                  onTapUp: (_) {
-                    setState(() {
-                      _isButtonPressed = false;
-                    });
-                    _showAddSectionDialog();
-                  },
-                  onTapCancel: () {
-                    setState(() {
-                      _isButtonPressed = false;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    transform: Matrix4.identity()..scale(_isButtonPressed ? 0.95 : 1.0),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue[700]!, Colors.teal[400]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
-                      ),
-                      child: const Text(
-                        'Add Section',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // const SizedBox(height: 12),
+              // Align(
+              //   alignment: Alignment.centerRight,
+              //   child: GestureDetector(
+              //     onTapDown: (_) {
+              //       setState(() {
+              //         _isButtonPressed = true;
+              //       });
+              //     },
+              //     onTapUp: (_) {
+              //       setState(() {
+              //         _isButtonPressed = false;
+              //       });
+              //       _showAddSectionDialog();
+              //     },
+              //     onTapCancel: () {
+              //       setState(() {
+              //         _isButtonPressed = false;
+              //       });
+              //     },
+              //     child: AnimatedContainer(
+              //       duration: const Duration(milliseconds: 100),
+              //       transform: Matrix4.identity()..scale(_isButtonPressed ? 0.95 : 1.0),
+              //       decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //           colors: [Colors.blue[700]!, Colors.teal[400]!],
+              //           begin: Alignment.topLeft,
+              //           end: Alignment.bottomRight,
+              //         ),
+              //         borderRadius: BorderRadius.circular(12),
+              //         boxShadow: [
+              //           BoxShadow(
+              //             color: Colors.blue.withOpacity(0.3),
+              //             blurRadius: 8,
+              //             offset: const Offset(0, 4),
+              //           ),
+              //         ],
+              //       ),
+              //       child: ElevatedButton(
+              //         onPressed: null,
+              //         style: ElevatedButton.styleFrom(
+              //           backgroundColor: Colors.transparent,
+              //           shadowColor: Colors.transparent,
+              //           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+              //         ),
+              //         child: const Text(
+              //           'Add Section',
+              //           style: TextStyle(
+              //             color: Colors.white,
+              //             fontWeight: FontWeight.bold,
+              //             fontSize: 16,
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -652,7 +680,7 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
                           })
                           .where((section) => section != null)
                           .join(',');
-                      if (user.isNotEmpty && sectionsString.isNotEmpty) {
+                      if (user.isNotEmpty) {
                         if (_validateSections()) {
                           await _addScanningDetail(user: user, sections: sectionsString);
                         }
@@ -696,7 +724,7 @@ class _AddScanningDetailPageState extends State<AddScanningDetailPage> {
                           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
                         ),
                         child: const Text(
-                          'Add',
+                          'Create',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

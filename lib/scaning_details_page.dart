@@ -205,7 +205,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
 
   Future<void> _fetchScanningDetails() async {
     final String apiUrl =
-        'http://192.168.100.110/stk_info_api/inv_scaning_get_scaning_record.php?shop_id=${widget.shop['id']}';
+        'https://www.talalgroupintl.com/stk_info_api/inv_scaning_get_scaning_record.php?shop_id=${widget.shop['id']}';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -234,11 +234,9 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
         filteredScanningDetails = List.from(scanningDetails);
       } else {
         filteredScanningDetails = scanningDetails.where((scan) {
-          final sectionString = scan['sections'] as String? ?? '';
-          final sectionList = sectionString.split(',');
-          return sectionList.any((section) {
-            final match = RegExp(r'^([^()]+)(\(([^()]*)\))?$').firstMatch(section.trim());
-            final sectionName = match?.group(1)?.trim() ?? section.trim();
+          final sectionsList = scan['sections'] as List<dynamic>? ?? [];
+          return sectionsList.any((section) {
+            final sectionName = section['section'] as String? ?? '';
             return sectionName == selectedSection;
           });
         }).toList();
@@ -248,9 +246,9 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
 
   Future<void> _addScanningDetail({
     required String user,
-    required String sections,
+    required List<Map<String, dynamic>> sections,
   }) async {
-    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_form_scaning_record.php';
+    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_form_scaning_record.php';
 
     try {
       final response = await http.post(
@@ -259,7 +257,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
         body: jsonEncode({
           'shop_id': widget.shop['id'],
           'user': user,
-          'sections': sections,
+          'sections': sections, // Send as list
         }),
       );
 
@@ -285,18 +283,18 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
   Future<void> _updateScanningDetail({
     required int id,
     required String user,
-    required String sections,
+    required List<Map<String, dynamic>> sections,
   }) async {
-    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_update_records.php';
+    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_update_records.php';
 
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'id': id,
+          'scanning_record_id': id, // Match EditScanningDetailPage
           'user': user,
-          'sections': sections,
+          'sections': sections, // Send as list
         }),
       );
 
@@ -322,7 +320,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
   Future<void> _deleteScanningDetail({
     required int id,
   }) async {
-    const String apiUrl = 'http://192.168.100.110/stk_info_api/delete_scanning_record.php';
+    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/delete_scanning_record.php';
 
     try {
       final response = await http.post(
@@ -534,7 +532,7 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
                       itemCount: filteredScanningDetails.length,
                       itemBuilder: (context, index) {
                         final scan = filteredScanningDetails[index];
-                        final sections = (scan['sections'] as String? ?? '').split(',');
+                        final sectionsList = scan['sections'] as List<dynamic>? ?? [];
                         return Card(
                           margin: const EdgeInsets.only(bottom: 16.0),
                           child: ListTile(
@@ -558,10 +556,9 @@ class _ShopScanningDetailsPageState extends State<ShopScanningDetailsPage> with 
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text('Sections:'),
-                                ...sections.map((section) {
-                                  final match = RegExp(r'^([^()]+)(\(([^()]*)\))?$').firstMatch(section.trim());
-                                  final sectionName = match?.group(1)?.trim() ?? section.trim();
-                                  final comment = match?.group(3)?.trim() ?? '';
+                                ...sectionsList.map((section) {
+                                  final sectionName = section['section'] as String? ?? '';
+                                  final comment = section['comment'] as String? ?? '';
                                   return Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                                     decoration: BoxDecoration(

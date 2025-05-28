@@ -26,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Fetch shop details from backend
   Future<void> _fetchShops() async {
-    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_get_shop.php';
+    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_get_shop.php';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Fetch shop name based on shop code
   Future<void> _fetchShopName(String shopCode, TextEditingController shopNameController) async {
-    final String apiUrl = 'http://192.168.100.110/stk_info_api/get_shop_name.php?shop_code=$shopCode';
+    final String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/get_shop_name.php?shop_code=$shopCode';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
     required String date,
     required String remark,
   }) async {
-    const String apiUrl = 'http://192.168.100.110/stk_info_api/inv_scaning_form_shop.php';
+    const String apiUrl = 'https://www.talalgroupintl.com/stk_info_api/inv_scaning_form_shop.php';
 
     try {
       final response = await http.post(
